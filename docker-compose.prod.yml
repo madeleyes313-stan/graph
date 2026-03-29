@@ -14,19 +14,37 @@ services:
       - server_uploads:/app/uploads
     expose:
       - "3001"
+    networks:
+      default:
+      caddy_bridge:
+        aliases:
+          - knowledge-graph-server
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        VITE_BASE_PATH: ${WEB_VITE_BASE_PATH:-/}
+        VITE_API_BASE: ${WEB_VITE_API_BASE:-/api}
     restart: unless-stopped
     depends_on:
       server:
         condition: service_healthy
     ports:
       - "${HOST_HTTP_PORT:-8080}:80"
+    networks:
+      default:
+      caddy_bridge:
+        aliases:
+          - knowledge-graph-web
 
 volumes:
   server_data:
   server_uploads:
+
+networks:
+  caddy_bridge:
+    external: true
+    name: pawtripserver_default
 

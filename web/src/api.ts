@@ -17,6 +17,12 @@ import type {
   ViewOption,
 } from "./types";
 
+const API_BASE = (import.meta.env.VITE_API_BASE ?? "/api").replace(/\/$/, "");
+
+function apiPath(path: string) {
+  return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     headers: {
@@ -35,7 +41,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function fetchCases() {
-  return request<CaseListResponse>("/api/cases");
+  return request<CaseListResponse>(apiPath("/cases"));
 }
 
 export async function fetchGraph(params: {
@@ -65,41 +71,41 @@ export async function fetchGraph(params: {
     searchParams.set("focusDepth", String(params.focusDepth));
   }
 
-  return request<GraphResponse>(`/api/cases/${params.caseId}/fact-graph?${searchParams.toString()}`);
+  return request<GraphResponse>(apiPath(`/cases/${params.caseId}/fact-graph?${searchParams.toString()}`));
 }
 
 export function fetchHealth() {
-  return request<HealthResponse>("/api/health");
+  return request<HealthResponse>(apiPath("/health"));
 }
 
 export function fetchDocuments(caseId: string) {
-  return request<DocumentListResponse>(`/api/cases/${caseId}/documents`);
+  return request<DocumentListResponse>(apiPath(`/cases/${caseId}/documents`));
 }
 
 export function deleteDocument(caseId: string, documentId: string) {
-  return request<DeleteDocumentResponse>(`/api/cases/${caseId}/documents/${documentId}`, {
+  return request<DeleteDocumentResponse>(apiPath(`/cases/${caseId}/documents/${documentId}`), {
     method: "DELETE",
   });
 }
 
 export function fetchEntityDetail(caseId: string, entityId: string) {
-  return request<EntityDetail>(`/api/cases/${caseId}/fact-graph/entities/${entityId}`);
+  return request<EntityDetail>(apiPath(`/cases/${caseId}/fact-graph/entities/${entityId}`));
 }
 
 export function fetchEntities(caseId: string, pageSize = 200) {
-  return request<EntityListResponse>(`/api/cases/${caseId}/fact-graph/entities?page=1&pageSize=${pageSize}`);
+  return request<EntityListResponse>(apiPath(`/cases/${caseId}/fact-graph/entities?page=1&pageSize=${pageSize}`));
 }
 
 export function fetchRelationDetail(caseId: string, relationId: string) {
-  return request<RelationDetail>(`/api/cases/${caseId}/fact-graph/relations/${relationId}`);
+  return request<RelationDetail>(apiPath(`/cases/${caseId}/fact-graph/relations/${relationId}`));
 }
 
 export function fetchTimeline(caseId: string) {
-  return request<TimelineEvent[]>(`/api/cases/${caseId}/fact-graph/timeline`);
+  return request<TimelineEvent[]>(apiPath(`/cases/${caseId}/fact-graph/timeline`));
 }
 
 export function fetchVersions(caseId: string) {
-  return request<VersionRecord[]>(`/api/cases/${caseId}/fact-graph/versions`);
+  return request<VersionRecord[]>(apiPath(`/cases/${caseId}/fact-graph/versions`));
 }
 
 export function fetchVersionCompare(caseId: string, leftVersionId: string, rightVersionId: string) {
@@ -107,19 +113,21 @@ export function fetchVersionCompare(caseId: string, leftVersionId: string, right
     left: leftVersionId,
     right: rightVersionId,
   });
-  return request<VersionCompareResponse>(`/api/cases/${caseId}/fact-graph/versions/compare?${searchParams.toString()}`);
+  return request<VersionCompareResponse>(
+    apiPath(`/cases/${caseId}/fact-graph/versions/compare?${searchParams.toString()}`),
+  );
 }
 
 export function fetchStats(caseId: string) {
-  return request<GraphStats>(`/api/cases/${caseId}/fact-graph/stats`);
+  return request<GraphStats>(apiPath(`/cases/${caseId}/fact-graph/stats`));
 }
 
 export function fetchViews(caseId: string) {
-  return request<ViewOption[]>(`/api/cases/${caseId}/fact-graph/views`);
+  return request<ViewOption[]>(apiPath(`/cases/${caseId}/fact-graph/views`));
 }
 
 export function createExtractTask(caseId: string) {
-  return request<{ taskId: string; versionId: string; status: string }>(`/api/cases/${caseId}/fact-graph/tasks`, {
+  return request<{ taskId: string; versionId: string; status: string }>(apiPath(`/cases/${caseId}/fact-graph/tasks`), {
     method: "POST",
     body: JSON.stringify({
       taskType: "full_extract",
@@ -130,11 +138,11 @@ export function createExtractTask(caseId: string) {
 }
 
 export function fetchTask(caseId: string, taskId: string) {
-  return request<TaskResponse>(`/api/cases/${caseId}/fact-graph/tasks/${taskId}`);
+  return request<TaskResponse>(apiPath(`/cases/${caseId}/fact-graph/tasks/${taskId}`));
 }
 
 export function cancelTask(caseId: string, taskId: string) {
-  return request<TaskResponse>(`/api/cases/${caseId}/fact-graph/tasks/${taskId}/cancel`, {
+  return request<TaskResponse>(apiPath(`/cases/${caseId}/fact-graph/tasks/${taskId}/cancel`), {
     method: "POST",
     body: JSON.stringify({}),
   });
@@ -144,7 +152,7 @@ export async function uploadDocuments(caseId: string, files: File[]) {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
 
-  const response = await fetch(`/api/cases/${caseId}/documents/upload`, {
+  const response = await fetch(apiPath(`/cases/${caseId}/documents/upload`), {
     method: "POST",
     body: formData,
   });
@@ -158,21 +166,21 @@ export async function uploadDocuments(caseId: string, files: File[]) {
 }
 
 export function confirmEntity(caseId: string, entityId: string) {
-  return request<EntityDetail>(`/api/cases/${caseId}/fact-graph/entities/${entityId}/confirm`, {
+  return request<EntityDetail>(apiPath(`/cases/${caseId}/fact-graph/entities/${entityId}/confirm`), {
     method: "POST",
     body: JSON.stringify({}),
   });
 }
 
 export function confirmRelation(caseId: string, relationId: string) {
-  return request<RelationDetail>(`/api/cases/${caseId}/fact-graph/relations/${relationId}/confirm`, {
+  return request<RelationDetail>(apiPath(`/cases/${caseId}/fact-graph/relations/${relationId}/confirm`), {
     method: "POST",
     body: JSON.stringify({}),
   });
 }
 
 export function publishVersion(caseId: string, versionId: string) {
-  return request<VersionRecord>(`/api/cases/${caseId}/fact-graph/versions/${versionId}/publish`, {
+  return request<VersionRecord>(apiPath(`/cases/${caseId}/fact-graph/versions/${versionId}/publish`), {
     method: "POST",
     body: JSON.stringify({}),
   });
@@ -183,7 +191,7 @@ export function saveGraphLayout(
   entities: Array<{ entityId: string; x: number; y: number; layoutLocked?: boolean }>,
   reviewComment?: string,
 ) {
-  return request<GraphLayoutUpdateResponse>(`/api/cases/${caseId}/fact-graph/layout`, {
+  return request<GraphLayoutUpdateResponse>(apiPath(`/cases/${caseId}/fact-graph/layout`), {
     method: "POST",
     body: JSON.stringify({
       entities,
