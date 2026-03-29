@@ -77,6 +77,37 @@ docker compose --env-file .env -f docker-compose.prod.yml down
 docker compose --env-file .env -f docker-compose.prod.yml logs -f
 ```
 
+## 备份脚本
+
+已提供备份脚本:
+
+- `scripts/backup-knowledge-graph.sh`
+
+默认备份内容:
+
+- SQLite 数据卷
+- 上传卷宗数据卷
+- 当前部署环境变量与 compose 文件副本
+
+在服务器上执行:
+
+```bash
+cd /home/ubuntu/knowledge-graph
+bash scripts/backup-knowledge-graph.sh
+```
+
+默认输出目录:
+
+```bash
+/home/ubuntu/knowledge-graph/backups/<timestamp>/
+```
+
+可选环境变量:
+
+- `PROJECT_DIR`
+- `BACKUP_ROOT`
+- `RETENTION_DAYS`
+
 ## 验收检查
 
 启动后先验证:
