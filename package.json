@@ -1,0 +1,24 @@
+{
+  "name": "knowledge-graph",
+  "version": "1.0.0",
+  "description": "案件事实-关系图谱全栈演示项目",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix web\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:web": "npm run dev --prefix web",
+    "build": "npm run build --prefix server && npm run build --prefix web",
+    "build:server": "npm run build --prefix server",
+    "build:web": "npm run build --prefix web"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+
+if {$argc < 2} {
+  puts stderr "usage: tencent_ssh.exp <host> <command>"
+  exit 2
+}
+
+set host [lindex $argv 0]
+set command [lindex $argv 1]
+set password $env(TENCENT_SERVER_PASSWORD)
+
+spawn ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $host $command
+expect {
+  "*yes/no*" {
+    send "yes\r"
+    exp_continue
+  }
+  "*password:*" {
+    send -- "$password\r"
+  }
+}
+expect eof
